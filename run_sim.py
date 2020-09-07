@@ -7,6 +7,8 @@ from scipy.spatial.transform import Rotation as rot
 import rowan as quat
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.animation import FuncAnimation
+
 
 from src.config import Mass,Position,Radius,N,TotalMass,CartesianBasis,TimeStep,TotalSteps,g
 from src import levitation_forces as l_f
@@ -258,6 +260,9 @@ Times = np.zeros((TotalSteps+1,1))
 #AllParticlePositions = np.zeros((N, 3, TotalSteps+1))
 #AllParticlePositions[0] = Position
 Particles = np.zeros((N, TotalSteps+1, 3))
+curr_vector = np.array([1, 0, 0]) #holds the rotation state to be printed
+rot_vector_list = []
+euler_angle_list = []
 for i in range(N):
     Particles[i][0] = Position[i]
 print("Particles\n", Particles)
@@ -312,6 +317,16 @@ while Step < TotalSteps:
     #orientations seem to creep in unwanted positions (actual expected movement is on the order of 10^-5)
     PrincipalBasisInverse = np.linalg.inv(PrincipalBasis)
 #this keeps track of rotation I think
+    #print("Principle Basis inverse:\n",PrincipalBasisInverse)
+    rotation_object = rot.from_matrix(PrincipalBasisInverse)
+    #print(PrincipalBasisInverse)
+
+    curr_vector = rotation_object.apply(curr_vector)
+    #print(curr_vector)
+    rot_vector_list.append(curr_vector.copy())
+    #euler_angle_list.append (rotation_object.as_euler('xyz'))
+
+
     AllCOMVelocities[Step+1] = l_m.COMVelocity(ForceZ, AllCOMVelocities[Step])
     COM = l_m.COMPositionUpdate(ForceZ, COM, AllCOMVelocities[Step+1]) #Do not condense these steps because COM itself is called in in each iteration!!!
     AllCOMPositions[Step+1] = l_m.COMPositionUpdate(ForceZ, COM, AllCOMVelocities[Step+1])
@@ -334,11 +349,50 @@ while Step < TotalSteps:
 ###################################################################################################################
 #print("All Omegas", AllOmegas)
 
+
+#here I'll be visualizing the rotation
+for vector in rot_vector_list:
+    print(vector)
+
+print("About to begin plottinng vectors")
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+def get_arrow(i):
+    x = 0
+    y = 0
+    z = 0
+    u = rot_vector_list[i][0]
+    v = rot_vector_list[i][1]
+    w = rot_vector_list[i][2]
+    print(rot_vector_list[i], i)
+    return x,y,z,u,v,w
+
+quiver = ax.quiver(*get_arrow(0))
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.set_zlim(-2, 2)
+
+def update(theta):
+    global quiver
+    quiver.remove()
+    quiver = ax.quiver(*get_arrow(theta))
+
+ani = FuncAnimation(fig, update, frames=range(4000), interval=50)
+plt.show()
+
+
+
+
+
 #Plot Data
 print("Number of HC Positions: ", len(AllHCPositions))
 #Plotting capabilities
 fig = plt.figure()
 ax = plt.axes(projection='3d')
+
+
 
 
 
