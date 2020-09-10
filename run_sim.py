@@ -387,10 +387,9 @@ def get_arrow(i):
 quiver = ax.quiver(*get_arrow(0))
 #plt.show()
 #should replace 3 witch larggest distance
-ax.set_xlim(-ORIG_COM - 3, ORIG_COM + 3)
-ax.set_ylim(-ORIG_COM - 3, ORIG_COM + 3)
-ax.set_zlim(-ORIG_COM - 3, ORIG_COM +
-3)
+ax.set_xlim(- 3,3)
+ax.set_ylim( - 3,3)
+ax.set_zlim( - 3,  3)
 
 def update(theta):
     global quiver
