@@ -294,7 +294,7 @@ while Step < TotalSteps:
 
 
                                 #Drag adjustment
-    ForceZ = [0,0,-0.01]
+    ForceZ = [0,0,-0.1]
     #AllOmegas[Step] = np.dot(np.linalg.inv(PrincipalBasis), AllOmegas[Step])
     AllOmegas[Step+1] = RungeKuttaSolver(TorqueZ, AllOmegas[Step]) #pay attention to argument order!!!
     #DragAdjustment = LinDrag(AllHCPositions[Step], AllOmegas[Step]) #Apply this linear drag (maybe use AllOmegas[Step]?)
@@ -325,16 +325,19 @@ while Step < TotalSteps:
 #this keeps track of rotation I think
     #print("Principle Basis inverse:\n",PrincipalBasisInverse)
     rotation_object = rot.from_matrix(PrincipalBasis)
+    print(rotation_object.as_quat())
     #print(PrincipalBasisInverse)
     tmp_list = []
+    tmp_vectors = np.zeros((N,3))
     for i in range(N):
-        rotation_vectors[i] = rotation_object.apply(rotation_vectors[i])
+        tmp_vectors[i] = rotation_object.apply(rotation_vectors[i])
     #print(curr_vector)
         #print(rotation_vectors[i])
 
-        tmp_list.append(rotation_vectors[i].tolist().copy())
+        tmp_list.append(tmp_vectors[i].tolist().copy())
         #print(tmp_list)
     rot_vector_list.append(tmp_list)
+    print(tmp_vectors[0],Step)
     #print(rot_vector_list[0])
     #euler_angle_list.append (rotation_object.as_euler('xyz'))
 
@@ -394,11 +397,11 @@ ax.set_zlim( - 3,  3)
 def update(theta):
     global quiver
     quiver.remove()
-    #print(rot_vector_list[theta], theta)
+    print(rot_vector_list[theta], theta)
     quiver = ax.quiver(*get_arrow(theta))
     return quiver
 
-ani = FuncAnimation(fig, update, frames=range(4000), interval=50)
+ani = FuncAnimation(fig, update, frames=range(TotalSteps), interval=10)
 
 plt.show()
 
