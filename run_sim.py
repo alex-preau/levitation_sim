@@ -294,7 +294,7 @@ while Step < TotalSteps:
 
 
                                 #Drag adjustment
-    ForceZ = [0,0,-0.1]
+    ForceZ = [0,0,-.01]
     #AllOmegas[Step] = np.dot(np.linalg.inv(PrincipalBasis), AllOmegas[Step])
     AllOmegas[Step+1] = RungeKuttaSolver(TorqueZ, AllOmegas[Step]) #pay attention to argument order!!!
     #DragAdjustment = LinDrag(AllHCPositions[Step], AllOmegas[Step]) #Apply this linear drag (maybe use AllOmegas[Step]?)
@@ -303,7 +303,7 @@ while Step < TotalSteps:
     #Update HC positions
     #AllOmegas[Step] = np.array(AllOmegas[Step]).T
     #Need to somehow take AllOmega[Step+1] out of below so we can apply Drag() in a separate line, then feed a velocity back to the code line below
-    Velocity = np.array([0,0,0])
+    Velocity = np.array([0,0,0.1])
     Velocity = l_f.Drag(ObtainVelocity(AllOmegas[Step+1], AllHCPositions[Step])) #Applying drag
 
 #this is angular velocity rigth??
@@ -325,7 +325,8 @@ while Step < TotalSteps:
 #this keeps track of rotation I think
     #print("Principle Basis inverse:\n",PrincipalBasisInverse)
     rotation_object = rot.from_matrix(PrincipalBasis)
-    print(rotation_object.as_quat())
+    print(PrincipalBasis)
+    #print(rotation_object.as_quat())
     #print(PrincipalBasisInverse)
     tmp_list = []
     tmp_vectors = np.zeros((N,3))
@@ -337,7 +338,7 @@ while Step < TotalSteps:
         tmp_list.append(tmp_vectors[i].tolist().copy())
         #print(tmp_list)
     rot_vector_list.append(tmp_list)
-    print(tmp_vectors[0],Step)
+    #print(tmp_vectors[0],Step)
     #print(rot_vector_list[0])
     #euler_angle_list.append (rotation_object.as_euler('xyz'))
 
@@ -390,9 +391,9 @@ def get_arrow(i):
 quiver = ax.quiver(*get_arrow(0))
 #plt.show()
 #should replace 3 witch larggest distance
-ax.set_xlim(- 3,3)
+ax.set_xlim(- 10,10)
 ax.set_ylim( - 3,3)
-ax.set_zlim( - 3,  3)
+ax.set_zlim( - 10,  10)
 
 def update(theta):
     global quiver
